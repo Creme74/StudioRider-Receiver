@@ -12,7 +12,7 @@ of it is modified.
 | Software | Version | Licence |
 |---|---|---|
 | [JUCE](https://github.com/juce-framework/JUCE) | 9.0.4 | AGPL-3.0-only (or the commercial JUCE licence) |
-| VST3 SDK (Steinberg, included in JUCE) | | MIT |
+| VST3 SDK (Steinberg, included in JUCE; VST3 version only, not published yet) | | MIT |
 | AudioUnitSDK (Apple, included in JUCE) | | Apache-2.0 |
 | [libFLAC](https://github.com/xiph/flac) | 1.5.0 | BSD-3-Clause |
 | [libopus](https://github.com/xiph/opus) | 1.5.2 | BSD-3-Clause |

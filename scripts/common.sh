@@ -96,7 +96,7 @@ cmake_build() {
     say "Building (a few minutes the first time)"
     set +e
     cmake --build "$dir" --config Release -j"$(sysctl -n hw.ncpu)" \
-          --target StudioRiderReceiver_AU StudioRiderReceiver_VST3 2>&1 | tee "$dir.log" | grep --line-buffered -E "Built target|error:"
+          --target StudioRiderReceiver_AU 2>&1 | tee "$dir.log" | grep --line-buffered -E "Built target|error:"
     local status=${PIPESTATUS[0]}
     set -e
     [[ $status -eq 0 ]] || die "The build failed (full log: $dir.log)."

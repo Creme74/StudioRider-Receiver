@@ -84,8 +84,15 @@ if(STUDIORIDER_RECEIVER_BUILD_PLUGIN)
     endif()
     add_subdirectory(${JUCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/JUCE)
 
+    # For now only the Audio Unit is published: the VST3 (and Ableton Live, in
+    # either format) doesn't work yet. Outside macOS the VST3 is built for the
+    # tests only.
+    option(STUDIORIDER_RECEIVER_VST3 "Also build the VST3 (not working yet in some DAWs)" OFF)
     if(APPLE)
-        set(RECEIVER_FORMATS AU VST3)
+        set(RECEIVER_FORMATS AU)
+        if(STUDIORIDER_RECEIVER_VST3)
+            list(APPEND RECEIVER_FORMATS VST3)
+        endif()
     else()
         set(RECEIVER_FORMATS VST3)
     endif()

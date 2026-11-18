@@ -4,61 +4,82 @@
 
 # StudioRider Receiver
 
-A companion plugin for [StudioRider](https://github.com/Creme74/StudioRider).
+**A companion plugin for [StudioRider](https://github.com/Creme74/StudioRider).
+It does nothing on its own: it needs a listening link from StudioRider.**
 
-StudioRider lets someone listen to your DAW in a web browser: the listener needs
-nothing but the link. **StudioRider Receiver** is for listeners who would rather
-have the stream inside their own DAW, to monitor it next to their own tracks or
-to record it. It is optional: nothing changes for StudioRider users.
+> **Testing phase.** StudioRider Receiver is still being tested. To date it has
+> been tested and works **only in Logic Pro, as an Audio Unit**, on macOS.
+> Ableton Live does not work yet (neither as an Audio Unit nor as a VST3), and
+> the VST3 version is put aside for now. Other DAWs that load Audio Units are
+> untested. Reports are welcome in the [issues](../../issues).
+
+## What it is
+
+[StudioRider](https://github.com/Creme74/StudioRider) is a plugin that a studio
+puts on its master track: it shares what the DAW plays through a free public
+link, and **the listener only needs a web browser, nothing to install**. That
+stays the normal way to listen.
+
+StudioRider Receiver is for the listener who would rather receive that same link
+**inside their own DAW**: to hear the studio next to their own tracks, or to
+**record** the stream. It is optional, and nothing changes for the studio: it
+shares the same link as usual, and the receiver counts as one of its listeners.
 
 ```
-Studio:   DAW ─► StudioRider ─► Cloudflare link ─┬─► web browser (no install)
-Listener:                                        └─► DAW ─► StudioRider Receiver
+Studio:    DAW ─► StudioRider ─► public link ─┬─► web browser (nothing to install)
+Listener:                                     └─► DAW ─► StudioRider Receiver
 ```
+
+Without a link from a studio running StudioRider, the receiver has nothing to
+play.
 
 <p align="center">
-  <img src="docs/images/receiver.png" width="45%" alt="The StudioRider Receiver window: link, Connect/Disconnect, level meters, quality and buffer, stats">
+  <img src="docs/images/receiver.png" width="46%" alt="StudioRider Receiver playing a StudioRider link in CD quality, as the instrument of an instrument track">
 </p>
 
-- macOS 13 Ventura or later. Audio Unit and VST3.
-- Works with links from StudioRider 1.0 and later.
+## Requirements
+
+- macOS 13 Ventura or later, Apple Silicon.
+- A DAW that loads Audio Units. Tested: Logic Pro only (see above).
+- A StudioRider listening link (StudioRider 1.0 or later, on the studio's side).
 
 ## Installing
 
 There is no installer yet: build it from source (see [Building](#building)).
-Double-click **Build StudioRider Receiver.command**: it builds the plugin, puts
-it in your own `~/Library/Audio/Plug-Ins` folder and checks the Audio Unit.
-Then quit and reopen your DAW.
+Double-click **Build StudioRider Receiver.command**: it builds the Audio Unit,
+puts it in your own `~/Library/Audio/Plug-Ins/Components` folder and checks it
+(`auval`). Then quit and reopen your DAW.
 
-## Using it
+## Using it (Logic Pro)
 
-1. Create an **instrument track** and load **StudioRider Receiver** as its
-   instrument. As an Audio Unit, it is listed under **AU MIDI-controlled
-   Effects** (it ignores MIDI).
-2. Paste the link the studio sent you (**Paste**), then click **Connect**.
-3. To record what you hear, send that track to a bus and record the bus on an
+1. Ask the studio for its StudioRider link (it changes each time the studio
+   starts sharing).
+2. Create a **software instrument track** and load **StudioRider Receiver** as
+   its instrument: it is listed under **AU MIDI-controlled Effects** (it ignores
+   MIDI).
+3. Paste the link (**Paste**), then click **Connect**. The window shows the
+   format, the buffer, the bitrate and the level.
+4. To record what you hear, send that track to a bus and record the bus on an
    audio track.
 
-Why an instrument track: some DAWs never run an effect on an audio or aux track
-that carries no sound, to save CPU. The receiver's input is always silent (the
+Why an instrument track: Logic Pro doesn't run an effect on an audio or aux track
+that carries no sound, to save CPU. The receiver's input is always silent (its
 sound comes from the network), so there it would never be asked for audio. An
-instrument track is always run. If the plugin isn't run, its window says
-**Not processed**, and its meters still show the sound that arrives.
+instrument track is always run. If the plugin isn't run, its window says **Not
+processed**, and its meters still show the sound that arrives.
 
-**Quality** works as on the listening page: the studio's choice by default, or a
-lighter quality; the studio never sends more than its own setting. **Buffer** is
-the delay kept against network hiccups (0.5 s by default). The sound comes out at
-100 % (no volume control in the plugin: use the track's fader), converted to the
-DAW's sample rate. The two machines' clocks never run at exactly the same speed:
-the receiver follows the difference (a few dozen ppm, inaudible), so the buffer
-neither empties nor fills up over time.
+**Quality** works as on StudioRider's listening page: the studio's choice by
+default, or a lighter quality; the studio never sends more than its own setting.
+**Buffer** is the delay kept against network hiccups (0.5 s by default). The
+sound comes out at 100 % (no volume control in the plugin: use the track's
+fader), converted to the DAW's sample rate. The two machines' clocks never run at
+exactly the same speed: the receiver follows the difference (a few dozen ppm,
+inaudible), so the buffer neither empties nor fills up over time.
 
 The link is saved with the project, but opening a project never connects by
 itself. If the studio stops sharing, the receiver says so; if the connection
 drops, it reconnects on its own and gives up after 2 minutes. A StudioRider link
 accepts 5 listeners at a time, browsers and receivers together.
-
-The **☰** menu has **About** and **Check for updates**.
 
 ## How it works
 
@@ -79,15 +100,19 @@ The **☰** menu has **About** and **Check for updates**.
 On a Mac with Apple's Command Line Tools (`xcode-select --install`): double-click
 **Build StudioRider Receiver.command**, or run `./build.sh`. It downloads JUCE,
 libFLAC and libopus at the versions pinned in `scripts/common.sh` (CMake is
-installed with Homebrew if missing).
+installed with Homebrew if missing). The VST3 can still be built for testing
+(`-DSTUDIORIDER_RECEIVER_VST3=ON`), but it doesn't work yet.
 
 Tests (macOS or Linux): `scripts/run_tests.sh` (on Linux, `xvfb-run
 scripts/run_tests.sh`). They download StudioRider's sources and run its real
 server: FLAC bit-exactness, Opus, resampling quality, clock drift, quality
 changes, full studio, expired link, "Stop sharing", saved state, "Not
-processed", and screenshots of the window in `build/screenshots`.
+processed", and screenshots of the window in `build/screenshots`. They can't
+tell what a real DAW does with the plugin: that is what the testing phase is for.
 
 ## Licence
 
 GNU General Public License, version 3 or later: see [LICENSE](LICENSE). Third-party
 software and licences: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Logic Pro and Audio Units are trademarks of Apple Inc.; Ableton Live is a
+trademark of Ableton AG. StudioRider Receiver is not affiliated with them.

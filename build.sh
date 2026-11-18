@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 The StudioRider authors
 #
-# Builds StudioRider Receiver (AU + VST3) for this Mac and installs it for the
-# current user (~/Library/Audio/Plug-Ins), then checks the Audio Unit (auval).
+# Builds StudioRider Receiver (Audio Unit) for this Mac and installs it for the
+# current user (~/Library/Audio/Plug-Ins), then checks it (auval).
 set -euo pipefail
 cd "$(dirname "$0")"
 source scripts/common.sh
@@ -21,14 +21,15 @@ VST3="$PLUGINS/VST3/StudioRider Receiver.vst3"
 ART="$CMAKE_DIR/StudioRiderReceiver_artefacts/Release"
 
 say "Installing and signing locally"
-mkdir -p "$(dirname "$AU")" "$(dirname "$VST3")"
-rm -rf "$AU" "$VST3"
+mkdir -p "$(dirname "$AU")"
+rm -rf "$AU"
 cp -R "$ART/AU/StudioRider Receiver.component" "$AU"
-cp -R "$ART/VST3/StudioRider Receiver.vst3" "$VST3"
 codesign --force --deep --sign - "$AU" >/dev/null 2>&1
-codesign --force --deep --sign - "$VST3" >/dev/null 2>&1
 echo "AU:   $AU"
-echo "VST3: $VST3"
+if [[ -d "$VST3" ]]; then   # left by an earlier test build: the VST3 isn't ready yet
+    rm -rf "$VST3"
+    echo "Removed an earlier test copy of the VST3: $VST3"
+fi
 if [[ -d "/Library/Audio/Plug-Ins/Components/StudioRider Receiver.component" ]]; then
     echo "Note: StudioRider Receiver is also in /Library/Audio/Plug-Ins (for all users). Your DAW may see two copies."
 fi
