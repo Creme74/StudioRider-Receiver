@@ -39,16 +39,40 @@ play.
 
 ## Requirements
 
-- macOS 13 Ventura or later, Apple Silicon.
+- macOS 13 Ventura or later, Apple Silicon or Intel.
 - A DAW that loads Audio Units. Tested: Logic Pro only (see above).
 - A StudioRider listening link (StudioRider 1.0 or later, on the studio's side).
 
 ## Installing
 
-There is no installer yet: build it from source (see [Building](#building)).
-Double-click **Build StudioRider Receiver.command**: it builds the Audio Unit,
-puts it in your own `~/Library/Audio/Plug-Ins/Components` folder and checks it
-(`auval`). Then quit and reopen your DAW.
+Download **[StudioRider-Receiver-1.0.pkg](https://github.com/Creme74/StudioRider-Receiver/releases/download/v1.0/StudioRider-Receiver-1.0.pkg)**
+and open it (all versions: **[Releases](https://github.com/Creme74/StudioRider-Receiver/releases)**).
+It installs, for all users:
+
+| What | Where |
+|---|---|
+| Audio Unit | `/Library/Audio/Plug-Ins/Components/StudioRider Receiver.component` |
+| Uninstaller | `/Applications/StudioRider Receiver/Uninstall StudioRider Receiver.app` |
+| Licences | `/Library/Application Support/StudioRider Receiver` |
+
+The installer is not signed with an Apple Developer ID yet, so macOS refuses to
+open it the first time:
+
+- macOS 15 and later: open it once, click **Done**, then **System Settings >
+  Privacy & Security**, scroll down to the message about StudioRider Receiver and
+  click **Open Anyway**.
+- macOS 13 and 14: right-click (or Control-click) the `.pkg`, choose **Open**,
+  then **Open** again.
+
+If your DAW was open, quit and reopen it.
+
+To uninstall: **Applications > StudioRider Receiver > Uninstall StudioRider
+Receiver**. It asks for your password and removes the plugin and itself.
+StudioRider (if you also have it) and your projects are not touched.
+
+The installer replaces copies of StudioRider Receiver in your own
+`~/Library/Audio/Plug-Ins` folder (made with `build.sh`), so the DAW doesn't see
+the plugin twice. To build it yourself instead, see [Building](#building).
 
 ## Using it (Logic Pro)
 
@@ -98,7 +122,11 @@ accepts 5 listeners at a time, browsers and receivers together.
 ## Building
 
 On a Mac with Apple's Command Line Tools (`xcode-select --install`): double-click
-**Build StudioRider Receiver.command**, or run `./build.sh`. It downloads JUCE,
+**Build StudioRider Receiver.command**, or run `./build.sh`, to build it for this
+Mac and install it in your own `~/Library/Audio/Plug-Ins`. To make the installer
+(universal, Apple Silicon + Intel), double-click **Make StudioRider Receiver
+Installer.command**, or run `./package.sh`: it writes
+`build/StudioRider-Receiver-<version>.pkg` and the matching source archive. It downloads JUCE,
 libFLAC and libopus at the versions pinned in `scripts/common.sh` (CMake is
 installed with Homebrew if missing). The VST3 can still be built for testing
 (`-DSTUDIORIDER_RECEIVER_VST3=ON`), but it doesn't work yet.

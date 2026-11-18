@@ -1,0 +1,14 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 The StudioRider authors
+#
+# Runs as root before the files are copied: removes the previous version, so that
+# no stale file stays behind (inside the plugin bundle or in the support folder).
+# Only StudioRider Receiver's own files: StudioRider itself is left alone.
+for p in "/Library/Audio/Plug-Ins/Components/StudioRider Receiver.component" \
+         "/Library/Audio/Plug-Ins/VST3/StudioRider Receiver.vst3" \
+         "/Library/Application Support/StudioRider Receiver" \
+         "/Applications/StudioRider Receiver"; do
+    [[ -e "$p" ]] && rm -rf "$p"
+done
+exit 0
